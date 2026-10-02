@@ -1,3 +1,5 @@
+import { createActivitySharing } from "./sharing.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
@@ -40,6 +42,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  const sharedActivity = new URLSearchParams(window.location.search).get("activity");
+  let sharedActivityOpened = false;
 
   // Authentication state
   let currentUser = null;
@@ -474,12 +478,28 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    if (sharedActivity && !sharedActivityOpened) {
+      const sharedCard = Array.from(activitiesList.children).find(
+        (card) => card.dataset.activityName === sharedActivity
+      );
+      if (sharedCard) {
+        sharedActivityOpened = true;
+        sharedCard.scrollIntoView({ block: "center" });
+        sharedCard.focus({ preventScroll: true });
+      }
+    }
   }
 
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.dataset.activityName = name;
+    if (name === sharedActivity) {
+      activityCard.classList.add("shared-activity");
+      activityCard.tabIndex = -1;
+    }
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -591,6 +611,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    activityCard.appendChild(createActivitySharing(name));
     activitiesList.appendChild(activityCard);
   }
 
