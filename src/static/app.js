@@ -27,6 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
+  const themeToggle = document.getElementById("theme-toggle");
+  const themeIcon = document.getElementById("theme-icon");
+  const themeLabel = document.getElementById("theme-label");
 
   // Activity categories with corresponding colors
   const activityTypes = {
@@ -49,6 +52,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Authentication state
   let currentUser = null;
+
+  function setTheme(theme) {
+    const isDark = theme === "dark";
+    document.documentElement.dataset.theme = isDark ? "dark" : "light";
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+    themeToggle.setAttribute(
+      "aria-label",
+      `Switch to ${isDark ? "light" : "dark"} mode`
+    );
+    themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+    themeIcon.textContent = isDark ? "☀️" : "🌙";
+    themeLabel.textContent = isDark ? "Light mode" : "Dark mode";
+  }
+
+  setTheme(localStorage.getItem("theme"));
+  themeToggle.addEventListener("click", () => {
+    const theme =
+      document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    localStorage.setItem("theme", theme);
+    setTheme(theme);
+  });
 
   // Time range mappings for the dropdown
   const timeRanges = {
